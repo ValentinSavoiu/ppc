@@ -1,1 +1,2 @@
-"STL Vector"  "g++ ../stl-vector/stl-vector.cpp -o ./stl-vector.exe"  "./stl-vector.exe {filename}"
+STL Vector , g++ ../stl-vector/stl-vector.cpp -o stl-vector.exe , stl-vector.exe {filename}
+Skiplist , None , None
