@@ -39,7 +39,9 @@ void fun(string filename) {
     }
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop - start);
-    cout << (double) duration.count() << endl;
+    for (int thread_value : {1, 2, 4, 6, 8, 10, 12}) {
+        cout << thread_value << ' ' << (duration.count()) << '\n';
+    }
 }
 
 
