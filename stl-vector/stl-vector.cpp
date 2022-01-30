@@ -13,11 +13,11 @@ const string FIND = "FIND";
 const string DELETE = "DELETE";
 vector<int> v;
 
-void fun(string filename) {
+void fun(char* filename) {
+    auto start = high_resolution_clock::now();
     ifstream f(filename);
     int operationCount;
     f >> operationCount;
-    auto start = high_resolution_clock::now();
     for (int i = 0; i < operationCount; ++i) {
         string operation;
         int value;
@@ -25,9 +25,9 @@ void fun(string filename) {
         if (operation == INSERT) 
             v.push_back(value);
         else if (operation == FIND) 
-            auto it = find(v.begin(), v.end(), 10);
+            auto it = find(v.begin(), v.end(), value);
         else if (operation == DELETE) {
-            auto it = find(v.begin(), v.end(), 10);
+            auto it = find(v.begin(), v.end(), value);
             if (it != v.end())
                 v.erase(it);
         }
@@ -39,9 +39,7 @@ void fun(string filename) {
     }
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop - start);
-    for (int thread_value : {1, 2, 4, 6, 8, 10, 12}) {
-        cout << thread_value << ' ' << (duration.count()) << '\n';
-    }
+    cout << duration.count() / 1e6 << '\n';
 }
 
 

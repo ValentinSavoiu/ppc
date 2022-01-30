@@ -1,2 +1,3 @@
-STL Vector , g++ ../stl-vector/stl-vector.cpp -o stl-vector.exe , stl-vector.exe {filename}
+STL Vector , ../stl-vector/benchmark.sh {threads} {filename}
 Skiplist , None , None
+Chunk List , ../ChunkList/benchmark.sh {threads} {filename}

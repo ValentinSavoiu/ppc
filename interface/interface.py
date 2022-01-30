@@ -7,7 +7,8 @@ from random import random
 from matplotlib import pyplot
 from subprocess import PIPE, run
 
-THREADS = [1, 2, 4, 6, 8, 10, 12]
+THREADS = [1, 2, 4, 6, 8]
+THREADS_STR = '"1 2 4 6 8"'
 def out(command):
     result = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, shell=True)
     return result.stdout
@@ -19,7 +20,6 @@ def getFiles():
                                                         "*.txt*"),
                                                        ("all files",
                                                         "*.*")))
-    
     if len(experiment_filename) == 0:
         file_list_label.config(text = "No config file selected")
     else:
@@ -50,7 +50,7 @@ def generateExperiment(N):
         showinfo("Bad experiment number", "Bad experiment number. Default value used")
         N = 10
     
-    op_count = int(1e4)
+    op_count = int(1e5)
     generated = []
     for file_idx in range(N):
         filename = f"generated_{file_idx}.txt"
@@ -72,14 +72,11 @@ def generateExperiment(N):
     return generated
 
 def out_parse(output):
-    lines = output.split("\n")[:-1]
-    res = np.zeros(len(lines))
-    for i in range(len(lines)):
-        res[i] = float(lines[i].split(" ")[1])
-    return res
+    return np.array(output.split("\n")[:-1], dtype = float)
 
 def plot_runtimes(runtimes):
     for algo, times in runtimes.items():
+        print(algo, times)
         pyplot.plot(THREADS, times, label = algo)
     pyplot.show()
 
@@ -105,15 +102,13 @@ def work():
     for i in range(len(algorithms)):
         if algs[i].get() is True:
             algorithm_name = algorithms[i][0]
-            compile_command = algorithms[i][1]
-            run_command = algorithms[i][2]
+            run_command = algorithms[i][1]
             runtimes_dict[algorithm_name] = np.zeros(len(THREADS))
-            if compile_command != "None":
-                out(compile_command)
             
             if run_command != "None":
                 for file in operation_files:
                    current_run_command = run_command.replace("{filename}", file)
+                   current_run_command = current_run_command.replace("{threads}", THREADS_STR)
                    runtimes = out_parse(out(current_run_command))
                    runtimes_dict[algorithm_name] += runtimes / len(operation_files)
     
