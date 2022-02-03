@@ -1,3 +1,2 @@
-STL Vector , ../stl-vector/benchmark.sh {threads} {filename}
-Skiplist , None , None
 Chunk List , ../ChunkList/benchmark.sh {threads} {filename}
+Skip list , g++ ../SkipList/main.cpp ../SkipList/node.cpp ../SkipList/SkipList.cpp -o ../SkipList/main -pthread && ../SkipList/main {threads} {filename}

@@ -8,6 +8,9 @@ using namespace std::chrono;
 const string INSERT = "INSERT";
 const string FIND = "FIND";
 const string DELETE = "DELETE";
+ChunkList chunklist(3);
+const int chunkSize = 1000;
+const int N = 1000;
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 ll random(ll st, ll dr) {
@@ -31,33 +34,6 @@ void testSearch() {
     }
 }
 
-void testFile(char* file_name) {
-    ChunkList list(3);
-
-    const int chunkSize = 1000;
-    const int N = 1000;
-
-    ifstream f(file_name);
-    int operationCount;
-    f >> operationCount;
-    for (int i = 0; i < operationCount; ++i) {
-        string operation;
-        int value;
-        f >> operation >> value;
-        if (operation == INSERT) 
-            list.add(value);
-        else if (operation == FIND) 
-            list.contains(value);
-        else if (operation == DELETE) {
-            list.remove(value);
-        }
-        else {
-            cerr << "ERROR, unknown operation";
-            return;
-        }
-    
-    }
-}
 
 void benchmark(void (*fun)(), string fnName) {
     auto start = high_resolution_clock::now();
@@ -69,11 +45,57 @@ void benchmark(void (*fun)(), string fnName) {
     cout << duration.count() << endl;
 }
 
-void benchmark_file(void (*fun)(char*), char* file_name) {
+void benchmark_file(char* file_name) {
+    ifstream f(file_name);
+    string operation;
+    int operationCount;
+    f >> operation >> operationCount;
+    vector <int> add_list = vector<int>();
+    vector <int> find_list = vector<int>();
+    vector <int> delete_list = vector<int>();
+    for (int i = 0; i < operationCount; ++i) {
+        
+        int value;
+        f >> value;
+        if (operation == INSERT) 
+            add_list.push_back(value);
+        else if (operation == FIND) 
+            find_list.push_back(value);
+            
+        else if (operation == DELETE) {
+            delete_list.push_back(value);
+            
+        }
+        else {
+            cerr << "ERROR, unknown operation";
+            return;
+        }
+    
+    }
+    if (operation != INSERT) {
+        for (int i = 0; i < N; i++) {
+            chunklist.add(i);
+        }
+    }
+    
     auto start = high_resolution_clock::now();
-
-    fun(file_name);
-
+    if (operation == INSERT) {
+        for (int x : add_list) {
+            chunklist.add(x);
+        }
+    }
+    else {
+        if (operation == FIND) {
+            for (int x : find_list) {
+                chunklist.contains(x);
+            }
+        }
+        else {
+            for (int x : delete_list) {
+                chunklist.remove(x);
+            }
+        }
+    }
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop - start);
     cout << (double) duration.count() / 1e6 << endl;
@@ -81,6 +103,6 @@ void benchmark_file(void (*fun)(char*), char* file_name) {
 
 int main(int argc, char *argv[]) {
     //benchmark(testSearch, "Search");
-    benchmark_file(testFile, argv[1]);
+    benchmark_file(argv[1]);
     return 0;
 }
