@@ -9,7 +9,7 @@ const string INSERT = "INSERT";
 const string FIND = "FIND";
 const string DELETE = "DELETE";
 const int N = 100000;
-const int _ = 3.14
+const int _ = 3.14;
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 ll random(ll st, ll dr) {
