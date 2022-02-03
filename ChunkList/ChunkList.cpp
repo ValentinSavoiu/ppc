@@ -30,15 +30,23 @@ struct ChunkList {
     }
 
     void add(int el) {
+        volatile bool flag = false;
+
+        #pragma omp parallel for shared(flag)
         for (int i = 0; i < (int) list.size(); i++) {
+            if (flag) {
+                continue;
+            }
             if ((int) list[i].size() < chunkSize) {
                 list[i].push_back(el);
-                return;
+                flag = true;
             }
         }
 
-        list.push_back(vector<int>());
-        list[(int) list.size() - 1].push_back(el);
+        if (!flag) {
+            list.push_back(vector<int>());
+            list[(int) list.size() - 1].push_back(el);
+        } 
     }
 
     void add(int el, bool optimizeSqrtSize) {
@@ -47,13 +55,18 @@ struct ChunkList {
     }
 
     void remove(int el) {
+        volatile bool flag = false;
+
+        #pragma omp parallel for shared(flag)
         for (int i = 0; i < (int) list.size(); i++) {
+            if (flag) {
+                continue;
+            }
+            
             auto idx = upper_bound(list[i].begin(), list[i].end(), el - 1);
             if (idx == list[i].end()) {
                 continue;
             }
-
-            //cout << "asdasd " << *idx << endl;
             
             if (*idx != el) {
                 continue;
@@ -61,11 +74,13 @@ struct ChunkList {
 
             mtx.lock();
             list[i].erase(idx);
+            flag = true;
             mtx.unlock();
         }
     }
 
     void removeAll(int el) {
+        #pragma omp parallel for
         for (int i = 0; i < (int) list.size(); i++) {
             for (int j = 0; j < (int) list[i].size(); i++) {
                 if (list[i][j] == el) {
@@ -129,8 +144,8 @@ struct ChunkList {
 
     vector<int> getList() {
         vector<int> res;
-        for(int i = 0; i < (int)list.size(); i++) {
-            for(int j = 0; j < (int)list[i].size(); i++) {
+        for (int i = 0; i < (int)list.size(); i++) {
+            for (int j = 0; j < (int)list[i].size(); j++) {
                 res.push_back(list[i][j]);
             }
         }
