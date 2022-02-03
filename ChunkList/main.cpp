@@ -10,7 +10,7 @@ const string FIND = "FIND";
 const string DELETE = "DELETE";
 const int chunkSize = 100;
 ChunkList chunklist(chunkSize);
-const int N = 1000;
+const int N = 100000;
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 ll random(ll st, ll dr) {
@@ -77,6 +77,8 @@ void benchmark_file(char* file_name) {
             chunklist.add(i);
         }
     }
+
+    // cout << "gata add" << endl;
     
     auto start = high_resolution_clock::now();
     if (operation == INSERT) {
@@ -91,6 +93,8 @@ void benchmark_file(char* file_name) {
             }
         }
         else {
+            chunklist.sortList();
+            // cout << "gata sort" << endl;
             for (int x : delete_list) {
                 chunklist.remove(x);
             }
