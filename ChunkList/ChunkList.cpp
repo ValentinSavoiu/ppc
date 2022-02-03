@@ -4,7 +4,7 @@ using namespace std;
 
 struct ChunkList {
     int DEFAULT_SIZE = 1000;
-    vector<vector<int> > list;
+    vector<multiset<int> > list;
     int chunkSize;
     mutex mtx;
 
@@ -21,7 +21,7 @@ struct ChunkList {
     }
 
     ChunkList(int chunkSize) : chunkSize(chunkSize) {
-        list = vector<vector<int> >();
+        list = vector<multiset<int> >();
     }
 
     ChunkList(ChunkList &other) {
@@ -38,14 +38,14 @@ struct ChunkList {
                 continue;
             }
             if ((int) list[i].size() < chunkSize) {
-                list[i].push_back(el);
+                list[i].insert(el);
                 flag = true;
             }
         }
 
         if (!flag) {
-            list.push_back(vector<int>());
-            list[(int) list.size() - 1].push_back(el);
+            list.push_back(multiset<int>());
+            list[(int) list.size() - 1].insert(el);
         } 
     }
 
@@ -63,7 +63,7 @@ struct ChunkList {
                 continue;
             }
             
-            auto idx = upper_bound(list[i].begin(), list[i].end(), el - 1);
+            auto idx = list[i].upper_bound(el - 1);
             if (idx == list[i].end()) {
                 continue;
             }
@@ -83,10 +83,10 @@ struct ChunkList {
         #pragma omp parallel for
         for (int i = 0; i < (int) list.size(); i++) {
             for (int j = 0; j < (int) list[i].size(); i++) {
-                if (list[i][j] == el) {
-                    removeAt(i);
-                    i--;
-                }
+                // if (list[i][j] == el) {
+                //     removeAt(i);
+                //     i--;
+                // }
             }
         }
     }
@@ -101,7 +101,7 @@ struct ChunkList {
             return;
         }
 
-        list[convertIndexToChunk(index)].erase(list[convertIndexToChunk(index)].begin() + convertIndexToChunkPos(index));
+        // list[convertIndexToChunk(index)].erase(list[convertIndexToChunk(index)].begin() + convertIndexToChunkPos(index));
     }
 
     void set(int index, int el) {
@@ -109,7 +109,7 @@ struct ChunkList {
             return;
         }
         
-        list[convertIndexToChunk(index)][convertIndexToChunkPos(index)] = el;
+        // list[convertIndexToChunk(index)][convertIndexToChunkPos(index)] = el;
     }
 
     int get(int index) {
@@ -117,7 +117,7 @@ struct ChunkList {
             return -1; 
         }
 
-        return list[convertIndexToChunk(index)][convertIndexToChunkPos(index)];
+        // return list[convertIndexToChunk(index)][convertIndexToChunkPos(index)];
     }
 
     bool contains(int el) {
@@ -130,12 +130,16 @@ struct ChunkList {
             if (progress_state) {
                 continue;
             }
-            for (int j = 0; j < (int) list[i].size(); j++) {
-                if (list[i][j] == el) {
-                    progress_state = 1;
-                    found = true;
-                    break;
-                }
+            // for (int j = 0; j < (int) list[i].size(); j++) {
+            //     if (list[i][j] == el) {
+            //         progress_state = 1;
+            //         found = true;
+            //         break;
+            //     }
+            // }
+
+            if (list[i].find(el) != list[i].end()) {
+                found = true;
             }
         }
 
@@ -145,10 +149,14 @@ struct ChunkList {
     vector<int> getList() {
         vector<int> res;
         for (int i = 0; i < (int)list.size(); i++) {
-            for (int j = 0; j < (int)list[i].size(); j++) {
-                res.push_back(list[i][j]);
+            // for (int j = 0; j < (int)list[i].size(); j++) {
+            //     res.push_back(list[i][j]);
+            // }
+            for (auto it : list[i]) {
+                res.push_back(it);
             }
         }
+
         return res;
     }
 

@@ -8,9 +8,8 @@ using namespace std::chrono;
 const string INSERT = "INSERT";
 const string FIND = "FIND";
 const string DELETE = "DELETE";
-const int chunkSize = 100;
-ChunkList chunklist(chunkSize);
 const int N = 100000;
+const int _ = 3.14
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 ll random(ll st, ll dr) {
@@ -53,6 +52,10 @@ void benchmark_file(char* file_name) {
     vector <int> add_list = vector<int>();
     vector <int> find_list = vector<int>();
     vector <int> delete_list = vector<int>();
+
+    const int chunkSize = _ * sqrt(operationCount);
+    ChunkList chunklist(chunkSize);
+
     for (int i = 0; i < operationCount; ++i) {
         
         int value;
@@ -73,7 +76,7 @@ void benchmark_file(char* file_name) {
     
     }
     if (operation != INSERT) {
-        for (int i = 0; i < N; i++) {
+        for (int i = 0; i < operationCount; i++) {
             chunklist.add(i);
         }
     }
@@ -93,7 +96,7 @@ void benchmark_file(char* file_name) {
             }
         }
         else {
-            chunklist.sortList();
+            // chunklist.sortList();
             // cout << "gata sort" << endl;
             for (int x : delete_list) {
                 chunklist.remove(x);
